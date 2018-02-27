@@ -51,7 +51,7 @@
     outerDiv.className = "col-md-12";
 
     var divTitle = document.createElement("h4");
-    divTitle.innerHTML = "Off-Peak Download Volume";
+    divTitle.innerHTML = "Off-Peak Volume";
 
     //Progress-bar////////////////////////////////////
     var progress = document.createElement('div');
@@ -82,11 +82,13 @@
     var small_3 = document.createElement("small");
     small_3.innerHTML = "Monthly limit";
     var strong_3 = document.createElement("strong");
+    strong_3.setAttribute("style","margin-top: 5px");
     strong_3.innerHTML = offpeakVol+" GB";
 
     //Remaining-data///////////////////////////////
     var colmd4 = document.createElement("div");
     colmd4.className = "col-md-4";
+    colmd4.setAttribute("style","text-align: center;");
 
     var h5 = document.createElement("h5");
     h5.className = "progress-label";
@@ -102,6 +104,7 @@
 
     var colmd4_2 = document.createElement("div");
     colmd4_2.className = "col-md-4";
+    colmd4_2.setAttribute("style","text-align: right;");
 
     var h5_2 = document.createElement("h5");
     h5_2.className = "progress-label";
