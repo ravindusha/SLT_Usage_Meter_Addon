@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLT Usage Meter
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  Calculate off peak data
 // @author       RavinduSha
 // @match        https://www.internetvas.slt.lk/SLTVasPortal-war/application/home.nable
@@ -116,6 +116,65 @@
     strong_2.innerHTML = offpeakUsed+" GB";
     /////////////////////////////////////////////////////////
 
+
+    var now = new Date();
+    var daysOfMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    var today = now.getDate();
+    var average_offPeak = offpeak/(daysOfMonth-today+1);
+    var average_peak = peak/(daysOfMonth-today+1);
+    var avg_offPeak_remaining = average_offPeak.toFixed(3) + " GB/day";
+    var avg_peak_remaining = average_peak.toFixed(3) + " GB/day";
+
+    //////////////////////////////////////////////////////////
+
+    var average_area = document.createElement("div");
+    average_area.className = "col-md-12 bg-success";
+    average_area.setAttribute("style","background-color: #17a2b8; padding:10px;");
+
+    var average_peak_area = document.createElement("div");
+    average_peak_area.className = "col-md-6";
+
+    var average_peak_area_h5 = document.createElement("h5");
+    average_peak_area_h5.className = "progress-label";
+
+    var avg_peak_title = document.createElement("small");
+    avg_peak_title.innerHTML = "Average Peak Data Remaining";
+    avg_peak_title.setAttribute("style","color: white;");
+    var avg_peak = document.createElement("strong");
+    avg_peak.innerHTML = avg_peak_remaining;
+    avg_peak.setAttribute("style","color: white;");
+
+    average_peak_area_h5.appendChild(avg_peak_title);
+    average_peak_area_h5.innerHTML +="<br>";
+    average_peak_area_h5.appendChild(avg_peak);
+    average_peak_area.appendChild(average_peak_area_h5);
+
+
+    var average_offpeak_area = document.createElement("div");
+    average_offpeak_area.className = "col-md-6";
+
+    var average_offpeak_area_h5 = document.createElement("h5");
+    average_offpeak_area_h5.className = "progress-label";
+    average_offpeak_area_h5.setAttribute("style","text-align: right;");
+
+    var avg_offpeak_title = document.createElement("small");
+    avg_offpeak_title.innerHTML = "Average Off-Peak Data Remaining";
+    avg_offpeak_title.setAttribute("style","color: white;");
+    var avg_offPeak = document.createElement("strong");
+    avg_offPeak.innerHTML = avg_offPeak_remaining;
+    avg_offPeak.setAttribute("style","color: white;");
+
+    average_offpeak_area_h5.appendChild(avg_offpeak_title);
+    average_offpeak_area_h5.innerHTML +="<br>";
+    average_offpeak_area_h5.appendChild(avg_offPeak);
+    average_offpeak_area.appendChild(average_offpeak_area_h5);
+
+
+    average_area.appendChild(average_peak_area);
+    average_area.appendChild(average_offpeak_area);
+
+    //////////////////////////////////////////////////////////
+
     h5_3.appendChild(small_3);
     h5_3.innerHTML += "<br>";
     h5_3.appendChild(strong_3);
@@ -139,6 +198,9 @@
     outerDiv.appendChild(divTitle);
     outerDiv.appendChild(progress);
     outerDiv.appendChild(newElement);
+    var blankArea = document.createElement("h4");
+    outerDiv.appendChild(blankArea);
+    outerDiv.appendChild(average_area);
     outerRow.appendChild(outerDiv);
 
     var elementParent = element.parentNode;
