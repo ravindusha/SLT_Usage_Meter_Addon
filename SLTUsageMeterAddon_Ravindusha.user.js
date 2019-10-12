@@ -1,211 +1,121 @@
 // ==UserScript==
 // @name         SLT Usage Meter
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      2.0
 // @description  Calculate off peak data
 // @author       RavinduSha
-// @match        https://www.internetvas.slt.lk/SLTVasPortal-war/application/home.nable
-// @include      https://internetvas.slt.lk/SLTVasPortal-war/application/home.nable
+// @match        https://internetvas.slt.lk/dashboard
+// @include      http://internetvas.slt.lk/dashboard
+// @include      https://www.internetvas.slt.lk/dashboard
+// @include      http://www.internetvas.slt.lk/dashboard
 // @grant        none
+// @require      https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js
 // ==/UserScript==
 
 (function() {
     'use strict';
-
-    var totalText = document.querySelector("div:nth-child(2) > div.col-md-7 > div:nth-child(1) > div > div.row > div:nth-child(2) > h5 > strong").innerHTML;
-    var total = parseFloat(totalText);
-
-    var peakText = document.querySelector("div:nth-child(2) > div.col-md-7 > div:nth-child(2) > div > div.row > div:nth-child(2) > h5 > strong").innerHTML;
-    var peak = parseFloat(peakText);
-
-    var offpeak = Math.round((total-peak)*10)/10;
-
-    ////////////////////////////////////
-
-    var totalUsedText = document.querySelector("div:nth-child(2) > div.col-md-7 > div:nth-child(1) > div > div.row > div:nth-child(3) > h5 > strong").innerHTML;
-    var totalUsed = parseFloat(totalUsedText);
-
-    var peakUsedText = document.querySelector("div:nth-child(2) > div.col-md-7 > div:nth-child(2) > div > div.row > div:nth-child(3) > h5 > strong").innerHTML;
-    var peakUsed = parseFloat(peakUsedText);
-
-    var offpeakUsed = Math.round((totalUsed-peakUsed)*10)/10;
-
-    ///////////////////////////////////
-
-    var totalVolume = document.querySelector("div:nth-child(2) > div.col-md-7 > div:nth-child(1) > div > div.row > div:nth-child(1) > h5 > strong").innerHTML;
-    var totalVol = parseFloat(totalVolume);
-
-    var peakVolume = document.querySelector("div:nth-child(2) > div.col-md-7 > div:nth-child(2) > div > div.row > div:nth-child(1) > h5 > strong").innerHTML;
-    var peakVol = parseFloat(peakVolume);
-
-    var offpeakVol = Math.round((totalVol-peakVol)*10)/10;
-
-    ////////////////////////////////////////////
-
-    var element = document.querySelector("div.col-md-12 > div:nth-child(2) > div.col-md-7 > div:nth-child(2)");
-
-    var outerRow = document.createElement("div");
-    outerRow.className = "row";
-    outerRow.setAttribute("style","margin-top: 40px");
-
-    var outerDiv = document.createElement("div");
-    outerDiv.className = "col-md-12";
-
-    var divTitle = document.createElement("h4");
-    divTitle.innerHTML = "Off-Peak Volume";
-
-    //Progress-bar////////////////////////////////////
-    var progress = document.createElement('div');
-    progress.className = "progress";
-
-    var progressBar = document.createElement('div');
-    progressBar.className = "progress-bar";
-
-    var percentage = Math.round((offpeak/offpeakVol)*100);
-    progressBar.innerHTML = percentage+"%";
-
-    progressBar.setAttribute("role","progressbar");
-    progressBar.setAttribute("aria-valuenow","50");
-    progressBar.setAttribute("aria-valuemin","0");
-    progressBar.setAttribute("aria-valuemax","100");
-    progressBar.setAttribute("style","width: "+percentage+"%;  background-color: #0D0548  ");
-
-    //Monthly-Limit////////////////////////////////
-    var newElement = document.createElement('div');
-    newElement.className = "row";
-
-    var colmd4_3 = document.createElement("div");
-    colmd4_3.className = "col-md-4";
-
-    var h5_3 = document.createElement("h5");
-    h5_3.className = "progress-label";
-
-    var small_3 = document.createElement("small");
-    small_3.innerHTML = "Monthly limit";
-    var strong_3 = document.createElement("strong");
-    strong_3.setAttribute("style","margin-top: 5px");
-    strong_3.innerHTML = offpeakVol+" GB";
-
-    //Remaining-data///////////////////////////////
-    var colmd4 = document.createElement("div");
-    colmd4.className = "col-md-4";
-    colmd4.setAttribute("style","text-align: center;");
-
-    var h5 = document.createElement("h5");
-    h5.className = "progress-label";
-
-    var small = document.createElement("small");
-    small.innerHTML = "Remaining";
-    var strong = document.createElement("strong");
-    strong.innerHTML = offpeak+" GB";
-    ///////////////////////////////////////////////////////////
-
-
-    //Used data///////////////////////////////////////////////
-
-    var colmd4_2 = document.createElement("div");
-    colmd4_2.className = "col-md-4";
-    colmd4_2.setAttribute("style","text-align: right;");
-
-    var h5_2 = document.createElement("h5");
-    h5_2.className = "progress-label";
-
-    var small_2 = document.createElement("small");
-    small_2.innerHTML = "Used";
-    var strong_2 = document.createElement("strong");
-    strong_2.innerHTML = offpeakUsed+" GB";
-    /////////////////////////////////////////////////////////
-
-
-    var now = new Date();
-    var daysOfMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-    var today = now.getDate();
-    var average_offPeak = offpeak/(daysOfMonth-today+1);
-    var average_peak = peak/(daysOfMonth-today+1);
-    var avg_offPeak_remaining = average_offPeak.toFixed(3) + " GB/day";
-    var avg_peak_remaining = average_peak.toFixed(3) + " GB/day";
-
-    //////////////////////////////////////////////////////////
-
-    var average_area = document.createElement("div");
-    average_area.className = "col-md-12 bg-success";
-    average_area.setAttribute("style","background-color: #17a2b8; padding:10px;");
-
-    var average_peak_area = document.createElement("div");
-    average_peak_area.className = "col-md-6";
-
-    var average_peak_area_h5 = document.createElement("h5");
-    average_peak_area_h5.className = "progress-label";
-
-    var avg_peak_title = document.createElement("small");
-    avg_peak_title.innerHTML = "Average Peak Data Remaining";
-    avg_peak_title.setAttribute("style","color: white;");
-    var avg_peak = document.createElement("strong");
-    avg_peak.innerHTML = avg_peak_remaining;
-    avg_peak.setAttribute("style","color: white;");
-
-    average_peak_area_h5.appendChild(avg_peak_title);
-    average_peak_area_h5.innerHTML +="<br>";
-    average_peak_area_h5.appendChild(avg_peak);
-    average_peak_area.appendChild(average_peak_area_h5);
-
-
-    var average_offpeak_area = document.createElement("div");
-    average_offpeak_area.className = "col-md-6";
-
-    var average_offpeak_area_h5 = document.createElement("h5");
-    average_offpeak_area_h5.className = "progress-label";
-    average_offpeak_area_h5.setAttribute("style","text-align: right;");
-
-    var avg_offpeak_title = document.createElement("small");
-    avg_offpeak_title.innerHTML = "Average Off-Peak Data Remaining";
-    avg_offpeak_title.setAttribute("style","color: white;");
-    var avg_offPeak = document.createElement("strong");
-    avg_offPeak.innerHTML = avg_offPeak_remaining;
-    avg_offPeak.setAttribute("style","color: white;");
-
-    average_offpeak_area_h5.appendChild(avg_offpeak_title);
-    average_offpeak_area_h5.innerHTML +="<br>";
-    average_offpeak_area_h5.appendChild(avg_offPeak);
-    average_offpeak_area.appendChild(average_offpeak_area_h5);
-
-
-    average_area.appendChild(average_peak_area);
-    average_area.appendChild(average_offpeak_area);
-
-    //////////////////////////////////////////////////////////
-
-    h5_3.appendChild(small_3);
-    h5_3.innerHTML += "<br>";
-    h5_3.appendChild(strong_3);
-    colmd4_3.appendChild(h5_3);
-    newElement.appendChild(colmd4_3);
-
-    h5.appendChild(small);
-    h5.innerHTML += "<br>";
-    h5.appendChild(strong);
-    colmd4.appendChild(h5);
-    newElement.appendChild(colmd4);
-
-    h5_2.appendChild(small_2);
-    h5_2.innerHTML += "<br>";
-    h5_2.appendChild(strong_2);
-    colmd4_2.appendChild(h5_2);
-    newElement.appendChild(colmd4_2);
-
-    progress.appendChild(progressBar);
-
-    outerDiv.appendChild(divTitle);
-    outerDiv.appendChild(progress);
-    outerDiv.appendChild(newElement);
-    var blankArea = document.createElement("h4");
-    outerDiv.appendChild(blankArea);
-    outerDiv.appendChild(average_area);
-    outerRow.appendChild(outerDiv);
-
-    var elementParent = element.parentNode;
-    elementParent.insertBefore(outerRow, element.nextSibling);
-
-
-
+    let calculate = false;
+    setInterval(function(){
+        if(!calculate){
+            calculate = startCalculation(calculate);
+        }
+    },3000);
 })();
+
+function startCalculation(calculate){
+    var peakData = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div > div > div:nth-child(1) > div > div > div:nth-child(4) > h6").innerText;
+    if(!calculate){
+        if(peakData){
+            getData();
+            return true;
+        }
+    }
+}
+
+function getData(){
+    var pattern = /(\d+\.\d+GB)/g;
+    //get peak-time data usage
+    var peakData = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div > div > div:nth-child(1) > div > div > div:nth-child(4) > h6").innerText;
+    //get total data usage
+    var totalData = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div > div > div:nth-child(2) > div > div > div:nth-child(4) > h6").innerText;
+
+    var peakDataArray = peakData.match(pattern);
+    var totalDataArray = totalData.match(pattern);
+
+    //calculate off-peak data
+    var offpeakUsed = (parseFloat(totalDataArray[0])-parseFloat(peakDataArray[0])).toFixed(1);
+    var offpeakTotal = (parseFloat(totalDataArray[1])-parseFloat(peakDataArray[1])).toFixed(1);
+    var offpeakRemaining = (offpeakTotal-offpeakUsed).toFixed(1);
+    //calculate off-peak remaining percentage
+    var offpeakRemainingPercentage = ((offpeakRemaining/offpeakTotal)*100).toFixed(0);
+
+    //get parent element to add new data
+    var parent = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div");
+
+    //create new container to display off peak data
+    var container = document.createElement('div');
+    container.setAttribute("style","margin-top:1rem; margin-bottom:1rem; display: flex; align-items:center; flex-direction: column;");
+
+    var title = document.createElement('h6');
+    title.innerText = 'Off-Peak';
+    title.setAttribute("style","font-family: 'Open Sans'; font-size: 0.916667rem; color: rgba(74, 74, 74, 0.74); margin: 0px; margin-bottom:0.5rem;");
+
+    var remainingValueElement = document.createElement('span');
+    remainingValueElement.innerText = offpeakRemainingPercentage+" %";
+    remainingValueElement.setAttribute("style","font: 700 1.5rem 'Open Sans'; color:rgb(37, 151, 216);");
+
+    var remainingTextElement = document.createElement('span');
+    remainingTextElement.innerText = "Remaining";
+    remainingTextElement.setAttribute("style","font: 700 1rem 'Open Sans'; color:rgb(37, 151, 216);");
+
+    var remainingTextHolder = document.createElement('div');
+    remainingTextHolder.setAttribute("style","display: flex; align-items:center; flex-direction: column; margin-top: 9%; position: absolute;");
+
+    remainingTextHolder.appendChild(remainingValueElement);
+    remainingTextHolder.appendChild(remainingTextElement);
+
+    var usageTextElement = document.createElement('h6');
+    usageTextElement.innerText = offpeakUsed + "GB Used of " + offpeakTotal + "GB";
+    usageTextElement.setAttribute("style","font-family: 'Open Sans'; font-size: 0.916667rem;  color: rgba(95, 99, 104, 0.4); margin: 0px; margin-top:0.5rem;");
+
+    container.appendChild(title);
+
+    var chartHolder = document.createElement('div');
+    chartHolder.setAttribute("style","width: 28vw; height: fit-content; display: flex; align-items: center; flex-direction: column;");
+
+    var chart = document.createElement('canvas');
+    chart.setAttribute("id","remainingChart");
+    chart.setAttribute("style","width:inherit; height:inherit");
+
+    var data = {
+    datasets: [{
+        data: [offpeakRemaining, offpeakUsed],
+        backgroundColor:['rgb(37, 151, 216)','rgba(20, 128, 225, 0.2)']
+    }],
+
+    // These labels appear in the legend and in the tooltips when hovering different arcs
+    labels: [
+        'Remaining',
+        'Used'
+    ]
+};
+
+    var myDoughnutChart = new Chart(chart, {
+    type: 'doughnut',
+    data: data,
+    options: {
+    cutoutPercentage:75,
+    legend:{
+        display:false
+      }
+    }
+});
+
+    chartHolder.appendChild(remainingTextHolder);
+    chartHolder.appendChild(chart);
+    container.appendChild(chartHolder);
+    container.appendChild(usageTextElement);
+
+    //add new child element to the parent
+    parent.appendChild(container);
+    }
