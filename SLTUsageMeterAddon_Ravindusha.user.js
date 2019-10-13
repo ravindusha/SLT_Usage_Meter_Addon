@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLT Usage Meter
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @description  Calculate off peak data
 // @author       RavinduSha
 // @match        https://internetvas.slt.lk/dashboard
@@ -46,6 +46,7 @@ function getData(){
     var offpeakUsed = (parseFloat(totalDataArray[0])-parseFloat(peakDataArray[0])).toFixed(1);
     var offpeakTotal = (parseFloat(totalDataArray[1])-parseFloat(peakDataArray[1])).toFixed(1);
     var offpeakRemaining = (offpeakTotal-offpeakUsed).toFixed(1);
+    var peakRemaining = (parseFloat(peakDataArray[1])-parseFloat(peakDataArray[0])).toFixed(1);
     //calculate off-peak remaining percentage
     var offpeakRemainingPercentage = ((offpeakRemaining/offpeakTotal)*100).toFixed(0);
 
@@ -115,6 +116,47 @@ function getData(){
     chartHolder.appendChild(chart);
     container.appendChild(chartHolder);
     container.appendChild(usageTextElement);
+
+    //calculate average data remaining per a day
+    var now = new Date();
+    var daysOfMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+    var today = now.getDate();
+    var average_offPeak = offpeakRemaining/(daysOfMonth-today+1);
+    var average_peak = peakRemaining/(daysOfMonth-today+1);
+    var avg_offPeak_remaining = average_offPeak.toFixed(3) + " GB/day";
+    var avg_peak_remaining = average_peak.toFixed(3) + " GB/day";
+
+    var averageDataContainer = document.createElement('div');
+    averageDataContainer.setAttribute("style","display: flex; flex-direction: row; width:100%; margin-top:0.5rem; font-family: 'Open Sans'; font-size: 0.916667rem;  color: rgba(95, 99, 104, 0.8); font-weight:700; white-space:nowrap;");
+
+    var averagePeakDataContainer = document.createElement('div');
+    averagePeakDataContainer.setAttribute("style","display: flex; flex-direction: column; flex:1;align-items: center; border:solid 1px grey; border-radius:10px; margin:5px; padding:0.2rem;");
+
+    var averagePeakDataTitle = document.createElement('span');
+    //averagePeakDataTitle.setAttribute("style","white-space:nowrap;");
+    averagePeakDataTitle.innerText = "Remaining Peak Data";
+    var averagePeakDataValue = document.createElement('span');
+    averagePeakDataValue.innerText = avg_peak_remaining;
+
+    averagePeakDataContainer.appendChild(averagePeakDataTitle);
+    averagePeakDataContainer.appendChild(averagePeakDataValue);
+
+    var averageOffPeakDataContainer = document.createElement('div');
+    averageOffPeakDataContainer.setAttribute("style","display: flex; flex-direction: column; flex:1;align-items: center;  border:solid 1px grey; border-radius:10px; margin:5px; padding:0.2rem;");
+
+    var averageOffPeakDataTitle = document.createElement('span');
+    //averageOffPeakDataTitle.setAttribute("style","white-space:nowrap;");
+    averageOffPeakDataTitle.innerText = "Remaining Off-Peak Data";
+    var averageOffPeakDataValue = document.createElement('span');
+    averageOffPeakDataValue.innerText = avg_offPeak_remaining;
+
+    averageOffPeakDataContainer.appendChild(averageOffPeakDataTitle);
+    averageOffPeakDataContainer.appendChild(averageOffPeakDataValue);
+
+    averageDataContainer.appendChild(averagePeakDataContainer);
+    averageDataContainer.appendChild(averageOffPeakDataContainer);
+
+    container.appendChild(averageDataContainer);
 
     //add new child element to the parent
     parent.appendChild(container);
