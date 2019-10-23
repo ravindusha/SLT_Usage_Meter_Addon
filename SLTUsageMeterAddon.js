@@ -46,12 +46,33 @@ function getData(){
     var offpeakUsed = (parseFloat(totalDataArray[0])-parseFloat(peakDataArray[0])).toFixed(1);
     var offpeakTotal = (parseFloat(totalDataArray[1])-parseFloat(peakDataArray[1])).toFixed(1);
     var offpeakRemaining = (offpeakTotal-offpeakUsed).toFixed(1);
-    var peakRemaining = (parseFloat(peakDataArray[1])-parseFloat(peakDataArray[0])).toFixed(1);
     //calculate off-peak remaining percentage
     var offpeakRemainingPercentage = ((offpeakRemaining/offpeakTotal)*100).toFixed(0);
 
     //get parent element to add new data
     var parent = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div");
+
+    //create and append new element inside peak/total/offpeak to display remaining usage
+    var peakPercentageLabel = document.querySelector("div.col-lg-6:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > svg:nth-child(1) > text");
+    var peakPercentageText = document.querySelector("div.col-lg-6:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > p");
+    var totalPercentageLabel = document.querySelector("div.col-lg-6:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > svg:nth-child(1) > text");
+    var totalPercentageText = document.querySelector("div.col-lg-6:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(3) > p");
+    peakPercentageLabel.setAttribute("y","40%");
+    peakPercentageText.style.top = "-110px";
+    totalPercentageLabel.setAttribute("y","40%");
+    totalPercentageText.style.top = "-110px";
+
+    var selPeakContainer = document.querySelector("div.col-lg-6:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(3)");
+    var selPeakDataValue = document.createElement('p');
+    selPeakDataValue.innerText = (parseFloat(peakDataArray[1])-parseFloat(peakDataArray[0])).toFixed(1) + "GB";
+    selPeakDataValue.setAttribute("style","font: 700 1rem 'Open Sans'; color:rgb(153, 154, 155); margin-top:3px; position: absolute; top: 50%; left: 34%;");
+    selPeakContainer.appendChild(selPeakDataValue);
+
+    var selTotalContainer = document.querySelector("div.col-lg-6:nth-child(2) > div:nth-child(1) > div:nth-child(1) > div:nth-child(3)");
+    var selTotalDataValue = document.createElement('p');
+    selTotalDataValue.innerText = (parseFloat(totalDataArray[1])-parseFloat(totalDataArray[0])).toFixed(1) + "GB";
+    selTotalDataValue.setAttribute("style","font: 700 1rem 'Open Sans'; color:rgb(153, 154, 155); margin-top:3px; position: absolute; top: 50%; left: 34%;");
+    selTotalContainer.appendChild(selTotalDataValue);
 
     //create new container to display off peak data
     var container = document.createElement('div');
@@ -69,11 +90,16 @@ function getData(){
     remainingTextElement.innerText = "Remaining";
     remainingTextElement.setAttribute("style","font: 700 1rem 'Open Sans'; color:rgb(37, 151, 216);");
 
+    var remainingTextValue = document.createElement('p');
+    remainingTextValue.innerText = offpeakRemaining + "GB";
+    remainingTextValue.setAttribute("style","font: 700 1rem 'Open Sans'; color:rgb(153, 154, 155); margin-top:3px;");
+
     var remainingTextHolder = document.createElement('div');
-    remainingTextHolder.setAttribute("style","display: flex; align-items:center; flex-direction: column; margin-top: 9%; position: absolute;");
+    remainingTextHolder.setAttribute("style","display: flex; align-items:center; flex-direction: column; margin-top: 7.5%; position: absolute;");
 
     remainingTextHolder.appendChild(remainingValueElement);
     remainingTextHolder.appendChild(remainingTextElement);
+    remainingTextHolder.appendChild(remainingTextValue);
 
     var usageTextElement = document.createElement('h6');
     usageTextElement.innerText = offpeakUsed + "GB Used of " + offpeakTotal + "GB";
@@ -105,7 +131,7 @@ function getData(){
     type: 'doughnut',
     data: data,
     options: {
-    cutoutPercentage:75,
+    cutoutPercentage:76,
     legend:{
         display:false
       }
@@ -116,47 +142,6 @@ function getData(){
     chartHolder.appendChild(chart);
     container.appendChild(chartHolder);
     container.appendChild(usageTextElement);
-
-    //calculate average data remaining per a day
-    var now = new Date();
-    var daysOfMonth = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
-    var today = now.getDate();
-    var average_offPeak = offpeakRemaining/(daysOfMonth-today+1);
-    var average_peak = peakRemaining/(daysOfMonth-today+1);
-    var avg_offPeak_remaining = average_offPeak.toFixed(3) + " GB/day";
-    var avg_peak_remaining = average_peak.toFixed(3) + " GB/day";
-
-    var averageDataContainer = document.createElement('div');
-    averageDataContainer.setAttribute("style","display: flex; flex-direction: row; width:100%; margin-top:0.5rem; font-family: 'Open Sans'; font-size: 0.916667rem;  color: rgba(95, 99, 104, 0.8); font-weight:700; white-space:nowrap;");
-
-    var averagePeakDataContainer = document.createElement('div');
-    averagePeakDataContainer.setAttribute("style","display: flex; flex-direction: column; flex:1;align-items: center; border:solid 1px grey; border-radius:10px; margin:5px; padding:0.2rem;");
-
-    var averagePeakDataTitle = document.createElement('span');
-    //averagePeakDataTitle.setAttribute("style","white-space:nowrap;");
-    averagePeakDataTitle.innerText = "Remaining Peak Data";
-    var averagePeakDataValue = document.createElement('span');
-    averagePeakDataValue.innerText = avg_peak_remaining;
-
-    averagePeakDataContainer.appendChild(averagePeakDataTitle);
-    averagePeakDataContainer.appendChild(averagePeakDataValue);
-
-    var averageOffPeakDataContainer = document.createElement('div');
-    averageOffPeakDataContainer.setAttribute("style","display: flex; flex-direction: column; flex:1;align-items: center;  border:solid 1px grey; border-radius:10px; margin:5px; padding:0.2rem;");
-
-    var averageOffPeakDataTitle = document.createElement('span');
-    //averageOffPeakDataTitle.setAttribute("style","white-space:nowrap;");
-    averageOffPeakDataTitle.innerText = "Remaining Off-Peak Data";
-    var averageOffPeakDataValue = document.createElement('span');
-    averageOffPeakDataValue.innerText = avg_offPeak_remaining;
-
-    averageOffPeakDataContainer.appendChild(averageOffPeakDataTitle);
-    averageOffPeakDataContainer.appendChild(averageOffPeakDataValue);
-
-    averageDataContainer.appendChild(averagePeakDataContainer);
-    averageDataContainer.appendChild(averageOffPeakDataContainer);
-
-    container.appendChild(averageDataContainer);
 
     //add new child element to the parent
     parent.appendChild(container);
