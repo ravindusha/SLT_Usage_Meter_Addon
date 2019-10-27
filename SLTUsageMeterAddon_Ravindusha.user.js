@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLT Usage Meter
 // @namespace    http://tampermonkey.net/
-// @version      2.1
+// @version      2.2
 // @description  Calculate off peak data
 // @author       RavinduSha
 // @match        https://internetvas.slt.lk/dashboard
@@ -35,9 +35,11 @@ function startCalculation(calculate){
 function getData(){
     var pattern = /(\d+\.\d+GB)/g;
     //get peak-time data usage
-    var peakData = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div > div > div:nth-child(1) > div > div > div:nth-child(4) > h6").innerText;
+    var peakElement = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div > div > div:nth-child(1) > div > div > div:nth-child(4) > h6");
+    var peakData = peakElement.innerText;
     //get total data usage
-    var totalData = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div > div > div:nth-child(2) > div > div > div:nth-child(4) > h6").innerText;
+    var totalDataElement = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div > div > div:nth-child(2) > div > div > div:nth-child(4) > h6");
+    var totalData = totalDataElement.innerText;
 
     var peakDataArray = peakData.match(pattern);
     var totalDataArray = totalData.match(pattern);
@@ -46,9 +48,25 @@ function getData(){
     var offpeakUsed = (parseFloat(totalDataArray[0])-parseFloat(peakDataArray[0])).toFixed(1);
     var offpeakTotal = (parseFloat(totalDataArray[1])-parseFloat(peakDataArray[1])).toFixed(1);
     var offpeakRemaining = (offpeakTotal-offpeakUsed).toFixed(1);
+    var reaminingTotal = (parseFloat(totalDataArray[1])-parseFloat(totalDataArray[0])).toFixed(1);
     var peakRemaining = (parseFloat(peakDataArray[1])-parseFloat(peakDataArray[0])).toFixed(1);
     //calculate off-peak remaining percentage
     var offpeakRemainingPercentage = ((offpeakRemaining/offpeakTotal)*100).toFixed(0);
+
+    //new element to display remaining peak data
+    var peakRemainingElement = document.createElement('h6');
+    peakRemainingElement.setAttribute("style","font-family: 'Open Sans';font-size: 0.916667rem;color: rgba(95, 99, 104, 1);margin: 0px;");
+    peakRemainingElement.innerText = peakRemaining+"GB Remaining";
+    peakElement.parentNode.insertBefore(peakRemainingElement, peakElement.nextSibling);
+    //new element to display remaining total data
+    var totalRemainingElement = document.createElement('h6');
+    totalRemainingElement.setAttribute("style","font-family: 'Open Sans';font-size: 0.916667rem;color: rgba(95, 99, 104, 1);margin: 0px;");
+    totalRemainingElement.innerText = reaminingTotal+"GB Remaining";
+    totalDataElement.parentNode.insertBefore(totalRemainingElement, totalDataElement.nextSibling);
+    //new element to display remaining offpeak data
+    var offPeakRemainingElement = document.createElement('h6');
+    offPeakRemainingElement.setAttribute("style","font-family: 'Open Sans';font-size: 0.916667rem;color: rgba(95, 99, 104, 1);margin: 0px;");
+    offPeakRemainingElement.innerText = offpeakRemaining+"GB Remaining";
 
     //get parent element to add new data
     var parent = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div");
@@ -63,11 +81,11 @@ function getData(){
 
     var remainingValueElement = document.createElement('span');
     remainingValueElement.innerText = offpeakRemainingPercentage+" %";
-    remainingValueElement.setAttribute("style","font: 700 1.5rem 'Open Sans'; color:rgb(37, 151, 216);");
+    remainingValueElement.setAttribute("style",`font: 700 1.5rem 'Open Sans'; color:${offpeakRemaining<30 ?'rgb(255, 191, 0)':'rgb(37, 151, 216)'};`);
 
     var remainingTextElement = document.createElement('span');
     remainingTextElement.innerText = "Remaining";
-    remainingTextElement.setAttribute("style","font: 700 1rem 'Open Sans'; color:rgb(37, 151, 216);");
+    remainingTextElement.setAttribute("style",`font: 700 1rem 'Open Sans'; color:${offpeakRemaining<30 ?'rgb(255, 191, 0)':'rgb(37, 151, 216)'};`);
 
     var remainingTextHolder = document.createElement('div');
     remainingTextHolder.setAttribute("style","display: flex; align-items:center; flex-direction: column; margin-top: 9%; position: absolute;");
@@ -91,7 +109,7 @@ function getData(){
     var data = {
     datasets: [{
         data: [offpeakRemaining, offpeakUsed],
-        backgroundColor:['rgb(37, 151, 216)','rgba(20, 128, 225, 0.2)']
+        backgroundColor:[offpeakRemaining<30 ?'rgb(255, 191, 0)' :'rgb(37, 151, 216)',offpeakRemaining<30 ? 'rgba(255, 191, 0, 0.2)':'rgba(20, 128, 225, 0.2)']
     }],
 
     // These labels appear in the legend and in the tooltips when hovering different arcs
@@ -105,7 +123,7 @@ function getData(){
     type: 'doughnut',
     data: data,
     options: {
-    cutoutPercentage:75,
+    cutoutPercentage:76,
     legend:{
         display:false
       }
@@ -116,6 +134,7 @@ function getData(){
     chartHolder.appendChild(chart);
     container.appendChild(chartHolder);
     container.appendChild(usageTextElement);
+    container.appendChild(offPeakRemainingElement);
 
     //calculate average data remaining per a day
     var now = new Date();
