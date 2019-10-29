@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLT Usage Meter
 // @namespace    http://tampermonkey.net/
-// @version      2.2
+// @version      2.3
 // @description  Calculate off peak data
 // @author       RavinduSha
 // @match        https://internetvas.slt.lk/dashboard
@@ -81,11 +81,11 @@ function getData(){
 
     var remainingValueElement = document.createElement('span');
     remainingValueElement.innerText = offpeakRemainingPercentage+" %";
-    remainingValueElement.setAttribute("style",`font: 700 1.5rem 'Open Sans'; color:${offpeakRemaining<30 ?'rgb(255, 191, 0)':'rgb(37, 151, 216)'};`);
+    remainingValueElement.setAttribute("style",`font: 700 1.5rem 'Open Sans'; color:${offpeakRemaining<10 ?'rgb(254, 33, 33);': offpeakRemaining<30 ?'rgb(255, 191, 0)':'rgb(37, 151, 216)'};`);
 
     var remainingTextElement = document.createElement('span');
     remainingTextElement.innerText = "Remaining";
-    remainingTextElement.setAttribute("style",`font: 700 1rem 'Open Sans'; color:${offpeakRemaining<30 ?'rgb(255, 191, 0)':'rgb(37, 151, 216)'};`);
+    remainingTextElement.setAttribute("style",`font: 700 1rem 'Open Sans'; color:${offpeakRemaining<10 ?'rgb(254, 33, 33);' :offpeakRemaining<30 ?'rgb(255, 191, 0)':'rgb(37, 151, 216)'};`);
 
     var remainingTextHolder = document.createElement('div');
     remainingTextHolder.setAttribute("style","display: flex; align-items:center; flex-direction: column; margin-top: 9%; position: absolute;");
@@ -109,7 +109,7 @@ function getData(){
     var data = {
     datasets: [{
         data: [offpeakRemaining, offpeakUsed],
-        backgroundColor:[offpeakRemaining<30 ?'rgb(255, 191, 0)' :'rgb(37, 151, 216)',offpeakRemaining<30 ? 'rgba(255, 191, 0, 0.2)':'rgba(20, 128, 225, 0.2)']
+        backgroundColor:[offpeakRemaining<10 ?'rgb(254, 33, 33)' :offpeakRemaining<30 ?'rgb(255, 191, 0)' :'rgb(37, 151, 216)',offpeakRemaining<10 ?'rgba(254, 33, 33, 0.2)' :offpeakRemaining<30 ? 'rgba(255, 191, 0, 0.2)':'rgba(20, 128, 225, 0.2)']
     }],
 
     // These labels appear in the legend and in the tooltips when hovering different arcs
