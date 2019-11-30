@@ -1,13 +1,17 @@
 // ==UserScript==
 // @name         SLT Usage Meter
 // @namespace    http://tampermonkey.net/
-// @version      2.4
+// @version      2.5
 // @description  Calculate off peak data
 // @author       RavinduSha
 // @match        https://internetvas.slt.lk/dashboard
 // @include      http://internetvas.slt.lk/dashboard
+// @include      https://internetvas.slt.lk/login
+// @include      http://internetvas.slt.lk/login
 // @include      https://www.internetvas.slt.lk/dashboard
 // @include      http://www.internetvas.slt.lk/dashboard
+// @include      https://www.internetvas.slt.lk/login
+// @include      http://www.internetvas.slt.lk/login
 // @grant        none
 // @require      https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js
 // ==/UserScript==
@@ -23,7 +27,12 @@
 })();
 
 function startCalculation(calculate){
-    var peakData = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div > div > div:nth-child(1) > div > div > div:nth-child(4) > h6").innerText;
+    var peakData;
+    try{
+        peakData = document.querySelector("#root > div > div > div:nth-child(3) > div > div > div > div:nth-child(3) > div.col-md-8 > div > div:nth-child(1) > div > div > div > div:nth-child(1) > div > div > div:nth-child(4) > h6").innerText;
+    }catch(e){
+        //
+    }
     if(!calculate){
         if(peakData){
             getData();
@@ -88,7 +97,7 @@ function getData(){
     remainingTextElement.setAttribute("style",`font: 700 1rem 'Open Sans'; color:${offpeakRemainingPercentage<10 ?'rgb(254, 33, 33);' :offpeakRemainingPercentage<30 ?'rgb(255, 191, 0)':'rgb(37, 151, 216)'};`);
 
     var remainingTextHolder = document.createElement('div');
-    remainingTextHolder.setAttribute("style","display: flex; align-items:center; flex-direction: column; margin-top: 9%; position: absolute;");
+    remainingTextHolder.setAttribute("style","display: flex; align-items:center; flex-direction: column; margin-top: 8%; position: absolute;");
 
     remainingTextHolder.appendChild(remainingValueElement);
     remainingTextHolder.appendChild(remainingTextElement);
@@ -100,7 +109,7 @@ function getData(){
     container.appendChild(title);
 
     var chartHolder = document.createElement('div');
-    chartHolder.setAttribute("style","width: 28vw; height: fit-content; display: flex; align-items: center; flex-direction: column;");
+    chartHolder.setAttribute("style","width: 27vw; height: fit-content; display: flex; align-items: center; flex-direction: column;");
 
     var chart = document.createElement('canvas');
     chart.setAttribute("id","remainingChart");
@@ -119,11 +128,11 @@ function getData(){
     ]
 };
 
-    var myDoughnutChart = new Chart(chart, {
+    new Chart(chart, {
     type: 'doughnut',
     data: data,
     options: {
-    cutoutPercentage:76,
+    cutoutPercentage:77,
     legend:{
         display:false
       }
