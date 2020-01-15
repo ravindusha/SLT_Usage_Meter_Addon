@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SLT Usage Meter
 // @namespace    http://tampermonkey.net/
-// @version      2.5
+// @version      2.6
 // @description  Calculate off peak data
 // @author       RavinduSha
 // @match        https://internetvas.slt.lk/dashboard
@@ -12,6 +12,8 @@
 // @include      http://www.internetvas.slt.lk/dashboard
 // @include      https://www.internetvas.slt.lk/login
 // @include      http://www.internetvas.slt.lk/login
+// @updateURL    https://github.com/ravindusha/SLT_Usage_Meter_Addon/raw/master/SLTUsageMeterAddon_Ravindusha.user.js
+// @downloadURL  https://github.com/ravindusha/SLT_Usage_Meter_Addon/raw/master/SLTUsageMeterAddon_Ravindusha.user.js
 // @grant        none
 // @require      https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js
 // ==/UserScript==
